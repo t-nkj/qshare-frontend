@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QShare frontend
 
-## Getting Started
+同じtraQ IDの端末間で共有されたURLを閲覧・追加・管理する、QShareのWebフロントエンドです。
+Next.jsの静的エクスポートとしてビルドし、APIバックエンドとは同一オリジンで配信します。
 
-First, run the development server:
+## ローカル開発
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
+Node.jsとpnpmを使用します。
+
+```sh
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+開発時は `/v1` をQShareバックエンドへ転送できる同一オリジンのプロキシを用意してください。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ビルド
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```sh
+pnpm build
+```
 
-## Learn More
+静的ファイルは `out/` に出力されます。本番環境では `/v1/*` と `/healthz` をバックエンドへ、
+それ以外を `out/` の静的ファイルへルーティングします。
 
-To learn more about Next.js, take a look at the following resources:
+## 品質確認
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```sh
+pnpm format
+pnpm lint
+pnpm typecheck
+pnpm check
+pnpm build
+```
