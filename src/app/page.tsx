@@ -34,6 +34,7 @@ function UrlHistory() {
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [composerError, setComposerError] = useState<string | null>(null)
+    const [latestLinkCopied, setLatestLinkCopied] = useState(false)
 
     const handleApiError = useCallback(
         (caught: unknown, fallback: string) => {
@@ -125,6 +126,16 @@ function UrlHistory() {
         }
     }
 
+    async function copyLatestLink() {
+        try {
+            await navigator.clipboard.writeText(new URL("/latest", window.location.origin).toString())
+            setLatestLinkCopied(true)
+            window.setTimeout(() => setLatestLinkCopied(false), 2500)
+        } catch {
+            setError("最新URLページのリンクをコピーできませんでした")
+        }
+    }
+
     return (
         <AppShell>
             <section className="mx-auto w-full max-w-3xl px-4 pb-10 pt-6 sm:px-6 sm:pt-10">
@@ -133,9 +144,14 @@ function UrlHistory() {
                         <p className="mb-1 text-sm font-semibold text-blue-600">QShare</p>
                         <h1 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">共有URL</h1>
                     </div>
-                    <IconButton label="履歴を再読み込み" onClick={() => void loadInitial()} disabled={loading}>
-                        ↻
-                    </IconButton>
+                    <div className="flex items-center gap-2">
+                        <Button tone="secondary" size="small" onClick={() => void copyLatestLink()}>
+                            {latestLinkCopied ? "コピーしました" : "最新URL用リンクをコピー"}
+                        </Button>
+                        <IconButton label="履歴を再読み込み" onClick={() => void loadInitial()} disabled={loading}>
+                            ↻
+                        </IconButton>
+                    </div>
                 </header>
 
                 <form

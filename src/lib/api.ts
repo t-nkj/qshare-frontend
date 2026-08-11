@@ -103,6 +103,11 @@ export async function createUrl(token: string, url: string): Promise<SharedUrl> 
     return result.url
 }
 
+export async function getLatestUrl(token: string): Promise<SharedUrl> {
+    const result = await request<{ url: SharedUrl }>(`${API_BASE_PATH}/urls/latest`, { token })
+    return result.url
+}
+
 export async function listUrls(
     token: string,
     cursor?: string
