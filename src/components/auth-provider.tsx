@@ -7,6 +7,11 @@ import { Button, inputStyles } from "./ui"
 const TOKEN_KEY = "qshare.deviceToken"
 const DEVICE_ID_KEY = "qshare.deviceId"
 
+function neoShowcaseLoginUrl(): string {
+    const redirect = `${window.location.pathname}${window.location.search}${window.location.hash}`
+    return `/_oauth/login?redirect=${encodeURIComponent(redirect)}`
+}
+
 interface AuthContextValue {
     token: string | null
     currentDeviceId: string | null
@@ -100,7 +105,8 @@ function Registration({ onIssued, onComplete }: RegistrationProps) {
             setIssuedDeviceId(result.device.id)
         } catch (caught) {
             if (caught instanceof ApiError && caught.code === "TRAQ_AUTH_REQUIRED") {
-                setError("端末登録にはtraQへのログインが必要です。ログイン後にもう一度お試しください。")
+                window.location.assign(neoShowcaseLoginUrl())
+                return
             } else {
                 setError(caught instanceof ApiError ? caught.message : "端末を登録できませんでした")
             }
