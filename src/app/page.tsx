@@ -128,7 +128,7 @@ function UrlHistory() {
 
     async function copyLatestLink() {
         try {
-            await navigator.clipboard.writeText(new URL("/latest", window.location.origin).toString())
+            await navigator.clipboard.writeText(new URL("/latest/", window.location.origin).toString())
             setLatestLinkCopied(true)
             window.setTimeout(() => setLatestLinkCopied(false), 2500)
         } catch {

@@ -29,7 +29,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                     <Link href="/" className={navItem({ active: pathname === "/" })}>
                         URL履歴
                     </Link>
-                    <Link href="/devices" className={navItem({ active: pathname === "/devices" })}>
+                    <Link
+                        href="/devices/"
+                        className={navItem({ active: pathname === "/devices" || pathname === "/devices/" })}
+                    >
                         端末管理
                     </Link>
                 </div>
