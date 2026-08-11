@@ -15,6 +15,8 @@ export interface SharedUrl {
     expiresAt: string
 }
 
+const API_BASE_PATH = "/api/v1"
+
 interface ErrorBody {
     error?: {
         code?: string
@@ -71,16 +73,16 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 }
 
 export async function registerDevice(name: string): Promise<{ device: Device; token: string }> {
-    return request("/v1/devices", { method: "POST", body: { name } })
+    return request(`${API_BASE_PATH}/devices`, { method: "POST", body: { name } })
 }
 
 export async function listDevices(token: string): Promise<Device[]> {
-    const result = await request<{ devices: Device[] }>("/v1/devices", { token })
+    const result = await request<{ devices: Device[] }>(`${API_BASE_PATH}/devices`, { token })
     return result.devices
 }
 
 export async function renameDevice(token: string, deviceId: string, name: string): Promise<Device> {
-    const result = await request<{ device: Device }>(`/v1/devices/${deviceId}`, {
+    const result = await request<{ device: Device }>(`${API_BASE_PATH}/devices/${deviceId}`, {
         method: "PATCH",
         token,
         body: { name }
@@ -89,11 +91,11 @@ export async function renameDevice(token: string, deviceId: string, name: string
 }
 
 export async function deleteDevice(token: string, deviceId: string): Promise<void> {
-    await request<void>(`/v1/devices/${deviceId}`, { method: "DELETE", token })
+    await request<void>(`${API_BASE_PATH}/devices/${deviceId}`, { method: "DELETE", token })
 }
 
 export async function createUrl(token: string, url: string): Promise<SharedUrl> {
-    const result = await request<{ url: SharedUrl }>("/v1/urls", {
+    const result = await request<{ url: SharedUrl }>(`${API_BASE_PATH}/urls`, {
         method: "POST",
         token,
         body: { url }
@@ -107,9 +109,9 @@ export async function listUrls(
 ): Promise<{ urls: SharedUrl[]; nextCursor: string | null }> {
     const query = new URLSearchParams({ limit: "50" })
     if (cursor) query.set("cursor", cursor)
-    return request(`/v1/urls?${query.toString()}`, { token })
+    return request(`${API_BASE_PATH}/urls?${query.toString()}`, { token })
 }
 
 export async function deleteUrl(token: string, urlId: string): Promise<void> {
-    await request<void>(`/v1/urls/${urlId}`, { method: "DELETE", token })
+    await request<void>(`${API_BASE_PATH}/urls/${urlId}`, { method: "DELETE", token })
 }
