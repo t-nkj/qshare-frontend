@@ -28,8 +28,9 @@ NeoShowcaseがローカルには存在しないため、開発サーバーは `/
 pnpm build
 ```
 
-静的ファイルは `dist/` に出力されます。本番環境では `/api/v1/*` と `/api/healthz` をバックエンドへ、
-それ以外を `dist/` の静的ファイルへルーティングします。
+静的ファイルは `dist/` に出力されます。`/devices/` と `/latest/` 用の `index.html` もビルド時に
+生成されるため、NeoShowcaseのSPAフォールバック設定に依存せず深いリンクを直接開けます。本番環境では
+`/api/v1/*` と `/api/healthz` をバックエンドへ、それ以外を `dist/` の静的ファイルへルーティングします。
 
 NeoShowcaseではStatic Commandを選び、Artifact Pathを `dist`、SPAを有効にしてください。
 
