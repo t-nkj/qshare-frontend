@@ -6,7 +6,7 @@ const buttonStyles = tv({
     variants: {
         tone: {
             primary:
-                "bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-500/25 hover:scale-105 hover:from-sky-400 hover:to-blue-500 active:scale-100",
+                "bg-linear-to-br from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-500/25 hover:scale-105 hover:from-sky-400 hover:to-blue-500 active:scale-100",
             secondary:
                 "border border-white/70 bg-white/55 text-slate-700 shadow-lg shadow-slate-950/5 backdrop-blur-xl hover:scale-105 hover:bg-white/80 active:scale-100",
             danger: "bg-rose-500 text-white shadow-lg shadow-rose-500/20 hover:scale-105 hover:bg-rose-600 active:scale-100"
@@ -54,7 +54,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, VariantPr
     children: ReactNode
 }
 
-export function Button({ children, className, tone, size, type = "button", ...props }: ButtonProps) {
+export const Button = ({ children, className, tone, size, type = "button", ...props }: ButtonProps) => {
     return (
         <button type={type} className={buttonStyles({ tone, size, className })} {...props}>
             {children}
@@ -81,7 +81,7 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, Varia
     children: ReactNode
 }
 
-export function IconButton({ label, children, className, tone, type = "button", ...props }: IconButtonProps) {
+export const IconButton = ({ label, children, className, tone, type = "button", ...props }: IconButtonProps) => {
     return (
         <button type={type} aria-label={label} className={iconButtonStyles({ tone, className })} {...props}>
             {children}

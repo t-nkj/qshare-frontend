@@ -42,7 +42,7 @@ interface RequestOptions {
     body?: Record<string, string>
 }
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+const request = async <T>(path: string, options: RequestOptions = {}): Promise<T> => {
     const headers = new Headers({ Accept: "application/json" })
     if (options.token) headers.set("Authorization", `Bearer ${options.token}`)
     if (options.body) headers.set("Content-Type", "application/json")
@@ -72,16 +72,15 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     return (await response.json()) as T
 }
 
-export async function registerDevice(name: string): Promise<{ device: Device; token: string }> {
-    return request(`${API_BASE_PATH}/devices`, { method: "POST", body: { name } })
-}
+export const registerDevice = (name: string): Promise<{ device: Device; token: string }> =>
+    request(`${API_BASE_PATH}/devices`, { method: "POST", body: { name } })
 
-export async function listDevices(token: string): Promise<Device[]> {
+export const listDevices = async (token: string): Promise<Device[]> => {
     const result = await request<{ devices: Device[] }>(`${API_BASE_PATH}/devices`, { token })
     return result.devices
 }
 
-export async function renameDevice(token: string, deviceId: string, name: string): Promise<Device> {
+export const renameDevice = async (token: string, deviceId: string, name: string): Promise<Device> => {
     const result = await request<{ device: Device }>(`${API_BASE_PATH}/devices/${deviceId}`, {
         method: "PATCH",
         token,
@@ -90,11 +89,11 @@ export async function renameDevice(token: string, deviceId: string, name: string
     return result.device
 }
 
-export async function deleteDevice(token: string, deviceId: string): Promise<void> {
+export const deleteDevice = async (token: string, deviceId: string): Promise<void> => {
     await request<void>(`${API_BASE_PATH}/devices/${deviceId}`, { method: "DELETE", token })
 }
 
-export async function createUrl(token: string, url: string): Promise<SharedUrl> {
+export const createUrl = async (token: string, url: string): Promise<SharedUrl> => {
     const result = await request<{ url: SharedUrl }>(`${API_BASE_PATH}/urls`, {
         method: "POST",
         token,
@@ -103,20 +102,20 @@ export async function createUrl(token: string, url: string): Promise<SharedUrl> 
     return result.url
 }
 
-export async function getLatestUrl(token: string): Promise<SharedUrl> {
+export const getLatestUrl = async (token: string): Promise<SharedUrl> => {
     const result = await request<{ url: SharedUrl }>(`${API_BASE_PATH}/urls/latest`, { token })
     return result.url
 }
 
-export async function listUrls(
+export const listUrls = async (
     token: string,
     cursor?: string
-): Promise<{ urls: SharedUrl[]; nextCursor: string | null }> {
+): Promise<{ urls: SharedUrl[]; nextCursor: string | null }> => {
     const query = new URLSearchParams({ limit: "50" })
     if (cursor) query.set("cursor", cursor)
     return request(`${API_BASE_PATH}/urls?${query.toString()}`, { token })
 }
 
-export async function deleteUrl(token: string, urlId: string): Promise<void> {
+export const deleteUrl = async (token: string, urlId: string): Promise<void> => {
     await request<void>(`${API_BASE_PATH}/urls/${urlId}`, { method: "DELETE", token })
 }

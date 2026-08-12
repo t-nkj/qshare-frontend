@@ -11,11 +11,11 @@ const navItem = tv({
     }
 })
 
-export function AppShell({ children }: { children: ReactNode }) {
+export const AppShell = ({ children }: { children: ReactNode }) => {
     const pathname = window.location.pathname
 
     return (
-        <div className="min-h-dvh bg-gradient-to-br from-sky-100 via-slate-50 to-violet-100 pb-24 sm:pb-28">
+        <div className="min-h-dvh bg-linear-to-br from-sky-100 via-slate-50 to-violet-100 pb-24 sm:pb-28">
             <main>{children}</main>
             <nav
                 aria-label="メインナビゲーション"

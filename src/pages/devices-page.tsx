@@ -1,21 +1,11 @@
-import { type FormEvent, useCallback, useEffect, useState } from "react"
+import { type SubmitEvent, useCallback, useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { AuthGate, useAuth } from "@/components/auth-provider"
-import { Button, glassPanel, inputStyles } from "@/components/ui"
+import { DeviceCard } from "@/components/device-card"
+import { IconButton } from "@/components/ui"
 import { ApiError, type Device, deleteDevice, listDevices, renameDevice } from "@/lib/api"
 
-function formatDate(value: string | null): string {
-    if (!value) return "まだ使用されていません"
-    return new Intl.DateTimeFormat("ja-JP", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-    }).format(new Date(value))
-}
-
-function DeviceManagement() {
+const DeviceManagement = () => {
     const { token, currentDeviceId, invalidateToken } = useAuth()
     const [devices, setDevices] = useState<Device[]>([])
     const [loading, setLoading] = useState(true)
@@ -24,6 +14,7 @@ function DeviceManagement() {
     const [editingName, setEditingName] = useState("")
     const [saving, setSaving] = useState(false)
     const [deletingId, setDeletingId] = useState<string | null>(null)
+    const [tokenCopied, setTokenCopied] = useState(false)
 
     const handleError = useCallback(
         (caught: unknown, fallback: string) => {
@@ -53,13 +44,24 @@ function DeviceManagement() {
         void load()
     }, [load])
 
-    function startEditing(device: Device) {
+    const startEditing = (device: Device) => {
         setEditingId(device.id)
         setEditingName(device.name)
         setError(null)
     }
 
-    async function handleRename(event: FormEvent<HTMLFormElement>, device: Device) {
+    const handleCopyToken = async () => {
+        if (!token) return
+        try {
+            await navigator.clipboard.writeText(token)
+            setTokenCopied(true)
+            window.setTimeout(() => setTokenCopied(false), 2500)
+        } catch {
+            setError("端末トークンをコピーできませんでした")
+        }
+    }
+
+    const handleRename = async (event: SubmitEvent<HTMLFormElement>, device: Device) => {
         event.preventDefault()
         if (!token || saving) return
         const name = editingName.trim()
@@ -80,14 +82,13 @@ function DeviceManagement() {
         }
     }
 
-    async function handleDelete(device: Device) {
+    const handleDelete = async (device: Device) => {
         if (
             !token ||
             deletingId ||
             !window.confirm(`「${device.name}」を削除しますか？この端末のトークンは失効します。`)
-        ) {
+        )
             return
-        }
         setDeletingId(device.id)
         setError(null)
         try {
@@ -113,11 +114,10 @@ function DeviceManagement() {
                         <h1 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">端末管理</h1>
                         <p className="mt-2 text-sm text-slate-500">同じtraQ IDに接続されている端末です。</p>
                     </div>
-                    <Button tone="secondary" size="small" onClick={() => void load()} disabled={loading}>
-                        更新
-                    </Button>
+                    <IconButton label="端末一覧を再読み込み" onClick={() => void load()} disabled={loading}>
+                        ↻
+                    </IconButton>
                 </header>
-
                 {error ? (
                     <div
                         className="mb-5 rounded-2xl border border-rose-100/80 bg-rose-50/70 px-4 py-3 text-sm font-medium text-rose-700 backdrop-blur-xl"
@@ -126,7 +126,6 @@ function DeviceManagement() {
                         {error}
                     </div>
                 ) : null}
-
                 {loading ? (
                     <div className="space-y-3">
                         {[0, 1].map((item) => (
@@ -143,80 +142,22 @@ function DeviceManagement() {
                 ) : (
                     <ul className="space-y-3">
                         {devices.map((device) => (
-                            <li key={device.id} className={glassPanel({ className: "p-5" })}>
-                                {editingId === device.id ? (
-                                    <form onSubmit={(event) => void handleRename(event, device)}>
-                                        <label
-                                            htmlFor={`device-${device.id}`}
-                                            className="mb-2 block text-sm font-semibold text-slate-700"
-                                        >
-                                            端末名
-                                        </label>
-                                        <input
-                                            id={`device-${device.id}`}
-                                            value={editingName}
-                                            onChange={(event) => setEditingName(event.target.value)}
-                                            maxLength={64}
-                                            className={inputStyles()}
-                                        />
-                                        <div className="mt-4 flex justify-end gap-2">
-                                            <Button
-                                                tone="secondary"
-                                                size="small"
-                                                onClick={() => setEditingId(null)}
-                                                disabled={saving}
-                                            >
-                                                キャンセル
-                                            </Button>
-                                            <Button type="submit" size="small" disabled={saving}>
-                                                {saving ? "保存中…" : "保存"}
-                                            </Button>
-                                        </div>
-                                    </form>
-                                ) : (
-                                    <>
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="min-w-0">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <h2 className="truncate text-lg font-bold text-slate-950">
-                                                        {device.name}
-                                                    </h2>
-                                                    {device.id === currentDeviceId ? (
-                                                        <span className="rounded-full border border-sky-100/80 bg-sky-100/70 px-2.5 py-1 text-xs font-bold text-sky-700">
-                                                            この端末
-                                                        </span>
-                                                    ) : null}
-                                                </div>
-                                                <p className="mt-2 text-xs text-slate-500">
-                                                    最終使用: {formatDate(device.lastUsedAt)}
-                                                </p>
-                                                <p className="mt-1 text-xs text-slate-400">
-                                                    登録: {formatDate(device.createdAt)}
-                                                </p>
-                                            </div>
-                                            <div className="flex shrink-0 gap-2">
-                                                <Button
-                                                    tone="secondary"
-                                                    size="small"
-                                                    onClick={() => startEditing(device)}
-                                                >
-                                                    名前変更
-                                                </Button>
-                                            </div>
-                                        </div>
-                                        <div className="mt-5 border-t border-white/70 pt-4">
-                                            <button
-                                                type="button"
-                                                className="text-sm font-semibold text-rose-600 hover:text-rose-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rose-500 disabled:opacity-50"
-                                                disabled={deletingId === device.id}
-                                                onClick={() => void handleDelete(device)}
-                                            >
-                                                {deletingId === device.id ? "削除中…" : "この端末を削除"}
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
-                            </li>
+                            <DeviceCard
+                                key={device.id}
+                                device={device}
+                                currentDeviceId={currentDeviceId}
+                                editing={editingId === device.id}
+                                editingName={editingName}
+                                saving={saving}
+                                deleting={deletingId === device.id}
+                                tokenCopied={tokenCopied}
+                                onEditingNameChange={setEditingName}
+                                onStartEditing={() => startEditing(device)}
+                                onCancelEditing={() => setEditingId(null)}
+                                onRename={(event) => void handleRename(event, device)}
+                                onDelete={() => void handleDelete(device)}
+                                onCopyToken={() => void handleCopyToken()}
+                            />
                         ))}
                     </ul>
                 )}
@@ -225,10 +166,10 @@ function DeviceManagement() {
     )
 }
 
-export default function DevicesPage() {
-    return (
-        <AuthGate>
-            <DeviceManagement />
-        </AuthGate>
-    )
-}
+const DevicesPage = () => (
+    <AuthGate>
+        <DeviceManagement />
+    </AuthGate>
+)
+
+export default DevicesPage
