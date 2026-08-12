@@ -91,7 +91,7 @@ const UrlHistory = () => {
     }
 
     const handleDelete = async (item: SharedUrl) => {
-        if (!token || deletingId || !window.confirm("このURLを履歴から削除しますか？")) return
+        if (!token || deletingId) return
         setDeletingId(item.id)
         setError(null)
         try {
