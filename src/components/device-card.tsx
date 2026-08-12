@@ -96,14 +96,9 @@ export const DeviceCard = ({
                         </div>
                     </div>
                     <div className="mt-5 border-t border-white/70 pt-4">
-                        <button
-                            type="button"
-                            className="text-sm font-semibold text-rose-600 hover:text-rose-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rose-500 disabled:opacity-50"
-                            disabled={deleting}
-                            onClick={onDelete}
-                        >
+                        <Button tone="danger" size="small" disabled={deleting} onClick={onDelete}>
                             {deleting ? "削除中…" : "この端末を削除"}
-                        </button>
+                        </Button>
                     </div>
                 </>
             )}

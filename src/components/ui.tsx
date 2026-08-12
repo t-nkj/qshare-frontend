@@ -2,14 +2,13 @@ import type { ButtonHTMLAttributes, ReactNode } from "react"
 import { tv, type VariantProps } from "tailwind-variants"
 
 const buttonStyles = tv({
-    base: "inline-flex shrink-0 items-center justify-center rounded-full font-semibold transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:cursor-not-allowed disabled:opacity-50",
+    base: "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full font-semibold transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:cursor-not-allowed disabled:opacity-50",
     variants: {
         tone: {
-            primary:
-                "bg-linear-to-br from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-500/25 hover:scale-105 hover:from-sky-400 hover:to-blue-500 active:scale-100",
+            primary: "bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700",
             secondary:
-                "border border-white/70 bg-white/55 text-slate-700 shadow-lg shadow-slate-950/5 backdrop-blur-xl hover:scale-105 hover:bg-white/80 active:scale-100",
-            danger: "bg-rose-500 text-white shadow-lg shadow-rose-500/20 hover:scale-105 hover:bg-rose-600 active:scale-100"
+                "border border-white/70 bg-white/55 text-slate-700 shadow-lg shadow-slate-950/5 backdrop-blur-xl hover:bg-slate-200/80 hover:text-slate-950",
+            danger: "bg-rose-600 text-white shadow-lg shadow-rose-900/20 hover:bg-rose-700"
         },
         size: {
             normal: "h-11 px-5 text-sm",
@@ -29,7 +28,7 @@ export const inputStyles = tv({
         kind: {
             default: "h-11 rounded-2xl px-4 text-sm",
             composer:
-                "h-12 min-w-0 flex-1 border-transparent bg-transparent px-3 text-base shadow-none focus:border-transparent focus:bg-transparent focus:ring-0"
+                "h-12 min-w-0 flex-1 rounded-2xl border-transparent bg-white/40 px-3 text-base shadow-none focus:border-transparent focus:bg-white/65 focus:ring-0"
         }
     },
     defaultVariants: {
@@ -63,12 +62,12 @@ export const Button = ({ children, className, tone, size, type = "button", ...pr
 }
 
 const iconButtonStyles = tv({
-    base: "inline-flex size-10 shrink-0 items-center justify-center rounded-full text-xl font-medium transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:cursor-not-allowed disabled:opacity-40",
+    base: "inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-xl font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:cursor-not-allowed disabled:opacity-40",
     variants: {
         tone: {
             neutral:
-                "border border-white/70 bg-white/55 text-slate-600 shadow-lg shadow-slate-950/5 backdrop-blur-xl hover:scale-105 hover:bg-white/80",
-            danger: "bg-white/40 text-slate-400 hover:scale-105 hover:bg-rose-100/70 hover:text-rose-600"
+                "border border-white/70 bg-white/55 text-slate-600 shadow-lg shadow-slate-950/5 backdrop-blur-xl transition-colors duration-300 hover:bg-slate-200/80 hover:text-slate-950",
+            danger: "bg-white/40 text-slate-400 transition-colors duration-150 hover:bg-rose-100/70 hover:text-rose-600"
         }
     },
     defaultVariants: {

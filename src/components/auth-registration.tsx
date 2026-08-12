@@ -124,22 +124,22 @@ const RegistrationForm = ({ onIssued, onComplete }: RegistrationProps) => {
                 <button
                     type="button"
                     onClick={() => selectMode("register")}
-                    className={
+                    className={`cursor-pointer ${
                         mode === "register"
                             ? "rounded-full bg-white/85 px-3 py-2.5 shadow-md shadow-slate-950/10"
                             : "px-3 py-2.5 text-slate-500"
-                    }
+                    }`}
                 >
                     新しく登録
                 </button>
                 <button
                     type="button"
                     onClick={() => selectMode("token")}
-                    className={
+                    className={`cursor-pointer ${
                         mode === "token"
                             ? "rounded-full bg-white/85 px-3 py-2.5 shadow-md shadow-slate-950/10"
                             : "px-3 py-2.5 text-slate-500"
-                    }
+                    }`}
                 >
                     トークンを入力
                 </button>

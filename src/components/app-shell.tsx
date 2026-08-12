@@ -2,11 +2,11 @@ import type { ReactNode } from "react"
 import { tv } from "tailwind-variants"
 
 const navItem = tv({
-    base: "flex min-w-24 flex-1 items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 sm:flex-none",
+    base: "flex min-w-24 flex-1 items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 sm:flex-none",
     variants: {
         active: {
-            true: "bg-slate-900/90 text-white shadow-lg shadow-slate-950/20",
-            false: "text-slate-500 hover:bg-white/65 hover:text-slate-900"
+            true: "bg-slate-900 text-white shadow-lg shadow-slate-950/20",
+            false: "text-slate-500 hover:bg-slate-200/70 hover:text-slate-950"
         }
     }
 })

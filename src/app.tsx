@@ -23,7 +23,7 @@ const CurrentPage = () => {
                 <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">ページが見つかりません</h1>
                 <a
                     href="/"
-                    className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-linear-to-br from-sky-500 to-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-sky-500/25 transition duration-300 hover:scale-105 hover:from-sky-400 hover:to-blue-500"
+                    className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-colors duration-300 hover:bg-blue-700"
                 >
                     URL履歴へ戻る
                 </a>

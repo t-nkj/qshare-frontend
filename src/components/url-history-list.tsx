@@ -58,15 +58,19 @@ export const UrlHistoryList = ({
                 {urls.map((item, index) => (
                     <li
                         key={item.id}
-                        className="group rounded-3xl border border-white/75 bg-white/55 p-4 shadow-xl shadow-slate-950/5 backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:bg-white/75 hover:shadow-2xl hover:shadow-sky-900/10 sm:p-5"
+                        className="group relative rounded-3xl border border-white/75 bg-white/55 p-4 shadow-xl shadow-slate-950/5 backdrop-blur-2xl transition-colors duration-300 hover:bg-white/75 sm:p-5"
                     >
-                        <div className="flex gap-3">
-                            <a
-                                href={item.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="min-w-0 flex-1 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-500"
-                            >
+                        <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`${item.url}を開く`}
+                            className="absolute inset-0 rounded-3xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-500"
+                        >
+                            <span className="sr-only">{item.url}を開く</span>
+                        </a>
+                        <div className="pointer-events-none relative flex gap-3">
+                            <div className="min-w-0 flex-1">
                                 <div className="mb-2 flex items-center gap-2">
                                     {index === 0 ? (
                                         <span className="rounded-full border border-sky-100/80 bg-sky-100/70 px-2.5 py-1 text-xs font-bold text-sky-700">
@@ -77,24 +81,24 @@ export const UrlHistoryList = ({
                                         {displayHost(item.url)}
                                     </span>
                                 </div>
-                                <p className="break-all text-base font-medium leading-6 text-slate-900 group-hover:text-sky-700">
+                                <p className="break-all text-base font-medium leading-6 text-slate-900 transition-colors duration-300 group-hover:text-sky-700">
                                     {item.url}
                                 </p>
-                            </a>
+                            </div>
                             <IconButton
                                 label="URLを削除"
                                 tone="danger"
                                 disabled={deletingId === item.id}
                                 onClick={() => onDelete(item)}
+                                className="pointer-events-auto relative z-10"
                             >
                                 ×
                             </IconButton>
                         </div>
-                        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/70 pt-3 text-xs text-slate-500">
+                        <div className="pointer-events-none relative mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/70 pt-3 text-xs text-slate-500">
                             <span className="font-semibold text-slate-700">{item.sourceDeviceName}</span>
                             <span>{formatDate(item.createdAt)}</span>
                             <span>期限 {formatDate(item.expiresAt)}</span>
-                            <span className="ml-auto text-sky-600">開く ↗</span>
                         </div>
                     </li>
                 ))}

@@ -55,7 +55,7 @@ const LatestRedirect = () => {
                     <div className="mt-6">
                         <a
                             href="/"
-                            className="inline-flex h-11 items-center justify-center rounded-full bg-linear-to-br from-sky-500 to-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-sky-500/25 transition duration-300 hover:scale-105 hover:from-sky-400 hover:to-blue-500 active:scale-100"
+                            className="inline-flex h-11 items-center justify-center rounded-full bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-colors duration-300 hover:bg-blue-700"
                         >
                             URL履歴を開く
                         </a>
