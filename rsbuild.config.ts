@@ -16,7 +16,7 @@ export default defineConfig({
         meta: {
             description: "端末間でURLをすばやく共有"
         },
-        favicon: "./src/assets/favicon.ico"
+        favicon: "./src/assets/favicon.png"
     },
     server: {
         port: 3001,
