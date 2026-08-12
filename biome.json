@@ -7,7 +7,7 @@
     },
     "files": {
         "ignoreUnknown": true,
-        "includes": ["**", "!node_modules", "!.next", "!out", "!build"]
+        "includes": ["**", "!node_modules", "!dist", "!out", "!build"]
     },
     "formatter": {
         "enabled": true,
@@ -24,10 +24,6 @@
         "enabled": true,
         "rules": {
             "recommended": true
-        },
-        "domains": {
-            "next": "recommended",
-            "react": "recommended"
         }
     },
     "javascript": {

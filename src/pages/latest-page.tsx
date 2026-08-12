@@ -1,9 +1,6 @@
-"use client"
-
-import Link from "next/link"
 import { useEffect, useState } from "react"
 import { AuthGate, useAuth } from "@/components/auth-provider"
-import { Button } from "@/components/ui"
+import { glassPanel } from "@/components/ui"
 import { ApiError, getLatestUrl } from "@/lib/api"
 
 function LatestRedirect() {
@@ -43,22 +40,25 @@ function LatestRedirect() {
     }, [invalidateToken, token])
 
     return (
-        <main className="flex min-h-dvh items-center justify-center bg-slate-50 px-4">
-            <section className="w-full max-w-md rounded-3xl bg-white p-8 text-center shadow-xl shadow-slate-200/60">
+        <main className="flex min-h-dvh items-center justify-center bg-gradient-to-br from-sky-100 via-slate-50 to-violet-100 px-4">
+            <section className={glassPanel({ className: "w-full max-w-md p-8 text-center" })}>
                 <div
                     className={
                         failed
                             ? "mx-auto size-12 rounded-full bg-amber-100"
-                            : "mx-auto size-12 animate-pulse rounded-full bg-blue-600"
+                            : "mx-auto size-12 animate-pulse rounded-full bg-gradient-to-br from-sky-400 to-blue-600 shadow-lg shadow-sky-500/30"
                     }
                 />
                 <h1 className="mt-6 text-xl font-bold tracking-tight text-slate-950">QShare</h1>
                 <output className="mt-2 block text-sm leading-6 text-slate-600">{message}</output>
                 {failed ? (
                     <div className="mt-6">
-                        <Link href="/">
-                            <Button>URL履歴を開く</Button>
-                        </Link>
+                        <a
+                            href="/"
+                            className="inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-sky-500/25 transition duration-300 hover:scale-105 hover:from-sky-400 hover:to-blue-500 active:scale-100"
+                        >
+                            URL履歴を開く
+                        </a>
                     </div>
                 ) : null}
             </section>

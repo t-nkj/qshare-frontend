@@ -1,9 +1,7 @@
-"use client"
-
 import { type FormEvent, useCallback, useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { AuthGate, useAuth } from "@/components/auth-provider"
-import { Button, inputStyles } from "@/components/ui"
+import { Button, glassPanel, inputStyles } from "@/components/ui"
 import { ApiError, type Device, deleteDevice, listDevices, renameDevice } from "@/lib/api"
 
 function formatDate(value: string | null): string {
@@ -111,7 +109,7 @@ function DeviceManagement() {
             <section className="mx-auto w-full max-w-3xl px-4 pb-10 pt-6 sm:px-6 sm:pt-10">
                 <header className="mb-7 flex items-end justify-between gap-4">
                     <div>
-                        <p className="mb-1 text-sm font-semibold text-blue-600">QShare</p>
+                        <p className="mb-1 text-sm font-semibold text-sky-600">QShare</p>
                         <h1 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">端末管理</h1>
                         <p className="mt-2 text-sm text-slate-500">同じtraQ IDに接続されている端末です。</p>
                     </div>
@@ -122,7 +120,7 @@ function DeviceManagement() {
 
                 {error ? (
                     <div
-                        className="mb-5 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700"
+                        className="mb-5 rounded-2xl border border-rose-100/80 bg-rose-50/70 px-4 py-3 text-sm font-medium text-rose-700 backdrop-blur-xl"
                         role="alert"
                     >
                         {error}
@@ -132,17 +130,20 @@ function DeviceManagement() {
                 {loading ? (
                     <div className="space-y-3">
                         {[0, 1].map((item) => (
-                            <div key={item} className="h-36 animate-pulse rounded-3xl bg-white shadow-sm" />
+                            <div
+                                key={item}
+                                className="h-36 animate-pulse rounded-3xl border border-white/70 bg-white/50 shadow-xl shadow-slate-950/5"
+                            />
                         ))}
                     </div>
                 ) : devices.length === 0 ? (
-                    <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center text-slate-500">
+                    <div className="rounded-3xl border border-dashed border-white/80 bg-white/45 px-6 py-14 text-center text-slate-500 shadow-xl shadow-slate-950/5 backdrop-blur-2xl">
                         登録済みの端末がありません。
                     </div>
                 ) : (
                     <ul className="space-y-3">
                         {devices.map((device) => (
-                            <li key={device.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                            <li key={device.id} className={glassPanel({ className: "p-5" })}>
                                 {editingId === device.id ? (
                                     <form onSubmit={(event) => void handleRename(event, device)}>
                                         <label
@@ -181,7 +182,7 @@ function DeviceManagement() {
                                                         {device.name}
                                                     </h2>
                                                     {device.id === currentDeviceId ? (
-                                                        <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">
+                                                        <span className="rounded-full border border-sky-100/80 bg-sky-100/70 px-2.5 py-1 text-xs font-bold text-sky-700">
                                                             この端末
                                                         </span>
                                                     ) : null}
@@ -203,7 +204,7 @@ function DeviceManagement() {
                                                 </Button>
                                             </div>
                                         </div>
-                                        <div className="mt-5 border-t border-slate-100 pt-4">
+                                        <div className="mt-5 border-t border-white/70 pt-4">
                                             <button
                                                 type="button"
                                                 className="text-sm font-semibold text-rose-600 hover:text-rose-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rose-500 disabled:opacity-50"

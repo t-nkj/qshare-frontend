@@ -1,7 +1,7 @@
 # QShare frontend
 
 同じtraQ IDの端末間で共有されたURLを閲覧・追加・管理する、QShareのWebフロントエンドです。
-Next.jsの静的エクスポートとしてビルドし、APIバックエンドとは同一オリジンで配信します。
+RsbuildとReactで構築した静的SPAで、APIバックエンドとは同一オリジンで配信します。
 
 `/latest/` を開くと、保存済みの端末トークンで最新の共有URLを取得し、そのURLへ自動的に遷移します。
 
@@ -14,7 +14,13 @@ pnpm install
 pnpm dev
 ```
 
-開発時は `/api/v1` をQShareバックエンドへ転送できる同一オリジンのプロキシを用意してください。
+開発サーバーは `http://localhost:3001` で起動し、`/api/*` を `http://localhost:3000` の
+QShareバックエンドへ転送します。転送時には `/api` が取り除かれます。
+
+NeoShowcaseがローカルには存在しないため、開発サーバーは `/_oauth/login?redirect=...` を
+指定された相対パスへリダイレクトするローカル用のモックとして提供します。さらにAPIプロキシは
+`X-Forwarded-User: local-dev` を付与するため、バックエンドでは `local-dev` として端末登録・URL取得を
+試せます。この挙動は `pnpm dev` のみで、本番の静的ビルドには含まれません。
 
 ## ビルド
 
@@ -22,8 +28,10 @@ pnpm dev
 pnpm build
 ```
 
-静的ファイルは `out/` に出力されます。本番環境では `/api/v1/*` と `/api/healthz` をバックエンドへ、
-それ以外を `out/` の静的ファイルへルーティングします。
+静的ファイルは `dist/` に出力されます。本番環境では `/api/v1/*` と `/api/healthz` をバックエンドへ、
+それ以外を `dist/` の静的ファイルへルーティングします。
+
+NeoShowcaseではStatic Commandを選び、Artifact Pathを `dist`、SPAを有効にしてください。
 
 ## 品質確認
 

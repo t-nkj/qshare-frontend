@@ -1,8 +1,6 @@
-"use client"
-
 import { createContext, type FormEvent, type ReactNode, useContext, useEffect, useMemo, useState } from "react"
 import { ApiError, listDevices, registerDevice } from "@/lib/api"
-import { Button, inputStyles } from "./ui"
+import { Button, glassPanel, inputStyles } from "./ui"
 
 const TOKEN_KEY = "qshare.deviceToken"
 const DEVICE_ID_KEY = "qshare.deviceId"
@@ -59,8 +57,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!ready) {
         return (
-            <main className="flex min-h-dvh items-center justify-center bg-slate-50" aria-label="QShareを読み込み中">
-                <div className="size-10 animate-pulse rounded-full bg-blue-600" />
+            <main
+                className="flex min-h-dvh items-center justify-center bg-gradient-to-br from-sky-100 via-slate-50 to-violet-100"
+                aria-label="QShareを読み込み中"
+            >
+                <div className="size-10 animate-pulse rounded-full bg-gradient-to-br from-sky-400 to-blue-600 shadow-lg shadow-sky-500/30" />
             </main>
         )
     }
@@ -81,7 +82,7 @@ interface RegistrationProps {
 
 function Registration({ onIssued, onComplete }: RegistrationProps) {
     const [mode, setMode] = useState<"register" | "token">("register")
-    const [name, setName] = useState("このコンピューター")
+    const [name, setName] = useState("")
     const [tokenInput, setTokenInput] = useState("")
     const [issuedToken, setIssuedToken] = useState<string | null>(null)
     const [issuedDeviceId, setIssuedDeviceId] = useState<string | null>(null)
@@ -143,15 +144,15 @@ function Registration({ onIssued, onComplete }: RegistrationProps) {
 
     if (issuedToken) {
         return (
-            <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl shadow-slate-200/60 sm:p-8">
-                <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-emerald-100 text-2xl text-emerald-700">
+            <div className={glassPanel({ className: "w-full max-w-lg p-6 sm:p-8" })}>
+                <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-emerald-100/70 text-2xl text-emerald-700 shadow-lg shadow-emerald-500/10">
                     ✓
                 </div>
                 <h1 className="text-2xl font-bold tracking-tight text-slate-950">端末を登録しました</h1>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                     このトークンは今だけ表示されます。ショートカットや拡張機能で使う場合はコピーしてください。
                 </p>
-                <code className="mt-5 block select-all break-all rounded-2xl bg-slate-100 p-4 text-sm leading-6 text-slate-800">
+                <code className="mt-5 block select-all break-all rounded-2xl border border-white/70 bg-white/50 p-4 text-sm leading-6 text-slate-800 shadow-inner shadow-slate-950/5">
                     {issuedToken}
                 </code>
                 <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -172,14 +173,14 @@ function Registration({ onIssued, onComplete }: RegistrationProps) {
     }
 
     return (
-        <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl shadow-slate-200/60 sm:p-8">
+        <div className={glassPanel({ className: "w-full max-w-lg p-6 sm:p-8" })}>
             <div className="mb-7">
-                <p className="mb-1 text-sm font-semibold text-blue-600">QShare</p>
+                <p className="mb-1 text-sm font-semibold text-sky-600">QShare</p>
                 <h1 className="text-3xl font-bold tracking-tight text-slate-950">この端末を接続</h1>
                 <p className="mt-2 text-sm leading-6 text-slate-600">同じtraQ IDの端末間でURLを共有できます。</p>
             </div>
 
-            <div className="mb-6 grid grid-cols-2 rounded-full bg-slate-100 p-1 text-sm font-semibold">
+            <div className="mb-6 grid grid-cols-2 rounded-full border border-white/70 bg-slate-100/55 p-1 text-sm font-semibold shadow-inner shadow-slate-950/5">
                 <button
                     type="button"
                     onClick={() => {
@@ -188,7 +189,7 @@ function Registration({ onIssued, onComplete }: RegistrationProps) {
                     }}
                     className={
                         mode === "register"
-                            ? "rounded-full bg-white px-3 py-2.5 shadow-sm"
+                            ? "rounded-full bg-white/85 px-3 py-2.5 shadow-md shadow-slate-950/10"
                             : "px-3 py-2.5 text-slate-500"
                     }
                 >
@@ -201,7 +202,9 @@ function Registration({ onIssued, onComplete }: RegistrationProps) {
                         setError(null)
                     }}
                     className={
-                        mode === "token" ? "rounded-full bg-white px-3 py-2.5 shadow-sm" : "px-3 py-2.5 text-slate-500"
+                        mode === "token"
+                            ? "rounded-full bg-white/85 px-3 py-2.5 shadow-md shadow-slate-950/10"
+                            : "px-3 py-2.5 text-slate-500"
                     }
                 >
                     トークンを入力
@@ -219,6 +222,7 @@ function Registration({ onIssued, onComplete }: RegistrationProps) {
                             value={name}
                             onChange={(event) => setName(event.target.value)}
                             maxLength={64}
+                            placeholder="このコンピューター"
                             className={inputStyles()}
                         />
                     </div>
@@ -266,7 +270,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     const { token, saveToken } = useAuth()
     if (token) return children
     return (
-        <main className="flex min-h-dvh items-center justify-center bg-slate-50 px-4 py-10">
+        <main className="flex min-h-dvh items-center justify-center bg-gradient-to-br from-sky-100 via-slate-50 to-violet-100 px-4 py-10">
             <Registration
                 onIssued={(issuedToken, deviceId) => {
                     window.localStorage.setItem(TOKEN_KEY, issuedToken)

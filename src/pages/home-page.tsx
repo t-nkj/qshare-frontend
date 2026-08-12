@@ -1,9 +1,7 @@
-"use client"
-
 import { type FormEvent, useCallback, useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { AuthGate, useAuth } from "@/components/auth-provider"
-import { Button, IconButton, inputStyles } from "@/components/ui"
+import { Button, glassPanel, IconButton, inputStyles } from "@/components/ui"
 import { ApiError, createUrl, deleteUrl, listUrls, type SharedUrl } from "@/lib/api"
 
 function formatDate(value: string): string {
@@ -141,7 +139,7 @@ function UrlHistory() {
             <section className="mx-auto w-full max-w-3xl px-4 pb-10 pt-6 sm:px-6 sm:pt-10">
                 <header className="mb-6 flex items-end justify-between gap-4">
                     <div>
-                        <p className="mb-1 text-sm font-semibold text-blue-600">QShare</p>
+                        <p className="mb-1 text-sm font-semibold text-sky-600">QShare</p>
                         <h1 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">共有URL</h1>
                     </div>
                     <div className="flex items-center gap-2">
@@ -154,10 +152,7 @@ function UrlHistory() {
                     </div>
                 </header>
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="sticky top-3 z-20 mb-7 rounded-3xl border border-slate-200 bg-white/95 p-2 shadow-lg shadow-slate-200/60 backdrop-blur"
-                >
+                <form onSubmit={handleSubmit} className={glassPanel({ className: "sticky top-3 z-20 mb-7 p-2" })}>
                     <div className="flex items-center gap-2">
                         <label htmlFor="shared-url" className="sr-only">
                             共有するURL
@@ -190,7 +185,7 @@ function UrlHistory() {
 
                 {error ? (
                     <div
-                        className="mb-5 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700"
+                        className="mb-5 rounded-2xl border border-rose-100/80 bg-rose-50/70 px-4 py-3 text-sm font-medium text-rose-700 backdrop-blur-xl"
                         role="alert"
                     >
                         {error}
@@ -200,11 +195,14 @@ function UrlHistory() {
                 {loading ? (
                     <output className="block space-y-3" aria-label="URL履歴を読み込み中">
                         {[0, 1, 2].map((item) => (
-                            <div key={item} className="h-28 animate-pulse rounded-3xl bg-white shadow-sm" />
+                            <div
+                                key={item}
+                                className="h-28 animate-pulse rounded-3xl border border-white/70 bg-white/50 shadow-xl shadow-slate-950/5"
+                            />
                         ))}
                     </output>
                 ) : urls.length === 0 ? (
-                    <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+                    <div className="rounded-3xl border border-dashed border-white/80 bg-white/45 px-6 py-14 text-center shadow-xl shadow-slate-950/5 backdrop-blur-2xl">
                         <p className="text-lg font-semibold text-slate-900">まだURLがありません</p>
                         <p className="mt-2 text-sm leading-6 text-slate-500">
                             上の入力欄から、最初のURLを共有してみましょう。
@@ -215,7 +213,7 @@ function UrlHistory() {
                         {urls.map((item, index) => (
                             <li
                                 key={item.id}
-                                className="group rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5"
+                                className="group rounded-3xl border border-white/75 bg-white/55 p-4 shadow-xl shadow-slate-950/5 backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:bg-white/75 hover:shadow-2xl hover:shadow-sky-900/10 sm:p-5"
                             >
                                 <div className="flex gap-3">
                                     <a
@@ -226,7 +224,7 @@ function UrlHistory() {
                                     >
                                         <div className="mb-2 flex items-center gap-2">
                                             {index === 0 ? (
-                                                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">
+                                                <span className="rounded-full border border-sky-100/80 bg-sky-100/70 px-2.5 py-1 text-xs font-bold text-sky-700">
                                                     最新
                                                 </span>
                                             ) : null}
@@ -234,7 +232,7 @@ function UrlHistory() {
                                                 {displayHost(item.url)}
                                             </span>
                                         </div>
-                                        <p className="break-all text-[15px] font-medium leading-6 text-slate-900 group-hover:text-blue-700">
+                                        <p className="break-all text-base font-medium leading-6 text-slate-900 group-hover:text-sky-700">
                                             {item.url}
                                         </p>
                                     </a>
@@ -247,11 +245,11 @@ function UrlHistory() {
                                         ×
                                     </IconButton>
                                 </div>
-                                <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-100 pt-3 text-xs text-slate-500">
+                                <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/70 pt-3 text-xs text-slate-500">
                                     <span className="font-semibold text-slate-700">{item.sourceDeviceName}</span>
                                     <span>{formatDate(item.createdAt)}</span>
                                     <span>期限 {formatDate(item.expiresAt)}</span>
-                                    <span className="ml-auto text-blue-600">開く ↗</span>
+                                    <span className="ml-auto text-sky-600">開く ↗</span>
                                 </div>
                             </li>
                         ))}
@@ -270,7 +268,7 @@ function UrlHistory() {
     )
 }
 
-export default function Home() {
+export default function HomePage() {
     return (
         <AuthGate>
             <UrlHistory />
