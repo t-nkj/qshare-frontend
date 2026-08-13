@@ -37,6 +37,20 @@ export interface SharedFile {
     expiresAt: string
 }
 
+export interface FileUploadFailure {
+    index: number
+    name: string | null
+    error: {
+        code: string
+        message: string
+    }
+}
+
+export interface FileUploadResult {
+    created: SharedFile[]
+    failed: FileUploadFailure[]
+}
+
 const API_BASE_PATH = "/api/v1"
 
 interface ErrorBody {
@@ -184,7 +198,11 @@ export const listFiles = async (
     return request(`${API_BASE_PATH}/files?${query.toString()}`, { token })
 }
 
-export const uploadFile = (file: File, token: string, onProgress: (progress: number) => void): Promise<SharedFile> =>
+export const uploadFiles = (
+    files: File[],
+    token: string,
+    onProgress: (progress: number) => void
+): Promise<FileUploadResult> =>
     new Promise((resolve, reject) => {
         const request = new XMLHttpRequest()
         request.open("POST", `${API_BASE_PATH}/files`)
@@ -194,27 +212,35 @@ export const uploadFile = (file: File, token: string, onProgress: (progress: num
             if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100))
         })
         request.addEventListener("load", () => {
-            let body: { file?: SharedFile; error?: { code?: string; message?: string } } = {}
+            let body: Partial<FileUploadResult> & {
+                error?: { code?: string; message?: string }
+            } = {}
             try {
                 body = JSON.parse(request.responseText) as typeof body
             } catch {
                 // A proxy failure may return a non-JSON response.
             }
-            if (request.status >= 200 && request.status < 300 && body.file) {
-                resolve(body.file)
+            if (
+                request.status >= 200 &&
+                request.status < 300 &&
+                Array.isArray(body.created) &&
+                Array.isArray(body.failed)
+            ) {
+                resolve({ created: body.created, failed: body.failed })
                 return
             }
+            const error = body.error
             reject(
                 new ApiError(
                     request.status || 0,
-                    body.error?.code ?? "REQUEST_FAILED",
-                    body.error?.message ?? "ファイルをアップロードできませんでした"
+                    error?.code ?? "REQUEST_FAILED",
+                    error?.message ?? "ファイルをアップロードできませんでした"
                 )
             )
         })
         request.addEventListener("error", () => reject(new ApiError(0, "NETWORK_ERROR", "APIへ接続できませんでした")))
         const body = new FormData()
-        body.append("file", file)
+        for (const file of files) body.append("files", file)
         request.send(body)
     })
 

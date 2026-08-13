@@ -5,7 +5,7 @@ import { FileList } from "@/components/file-list"
 import { FileUpload } from "@/components/file-upload"
 import { FileUploadList, type UploadingFile } from "@/components/file-upload-list"
 import { IconButton } from "@/components/ui"
-import { ApiError, deleteFile, downloadFile, listFiles, renameFile, type SharedFile, uploadFile } from "@/lib/api"
+import { ApiError, deleteFile, downloadFile, listFiles, renameFile, type SharedFile, uploadFiles } from "@/lib/api"
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024
 
@@ -61,6 +61,8 @@ const FileHistory = () => {
     const handleFiles = useCallback(
         (input: File[]) => {
             if (!token) return
+            const validUploads: Array<{ file: File; id: string }> = []
+
             input.forEach((file) => {
                 const id = crypto.randomUUID()
                 const validationError = validateFile(file)
@@ -68,24 +70,67 @@ const FileHistory = () => {
                     ...current,
                     { id, name: file.name || "名前のないファイル", progress: 0, error: validationError }
                 ])
-                if (validationError) return
-                void uploadFile(file, token, (progress) =>
-                    setUploads((current) => current.map((item) => (item.id === id ? { ...item, progress } : item)))
-                )
-                    .then((uploaded) => {
-                        setFiles((current) => [uploaded, ...current.filter((item) => item.id !== uploaded.id)])
-                        setUploads((current) => current.filter((item) => item.id !== id))
-                    })
-                    .catch((caught: unknown) => {
-                        const message =
-                            caught instanceof ApiError ? caught.message : "ファイルをアップロードできませんでした"
-                        setUploads((current) =>
-                            current.map((item) => (item.id === id ? { ...item, error: message } : item))
-                        )
-                    })
+                if (!validationError) validUploads.push({ file, id })
             })
+
+            if (validUploads.length === 0) return
+
+            void uploadFiles(
+                validUploads.map((upload) => upload.file),
+                token,
+                (progress) =>
+                    setUploads((current) =>
+                        current.map((item) =>
+                            validUploads.some((upload) => upload.id === item.id) ? { ...item, progress } : item
+                        )
+                    )
+            )
+                .then(({ created, failed }) => {
+                    const failedByIndex = new Map(failed.map((failure) => [failure.index, failure]))
+                    const createdIds = new Set<string>()
+                    const uploadErrors = new Map<string, string>()
+                    let createdIndex = 0
+
+                    validUploads.forEach((upload, index) => {
+                        const failure = failedByIndex.get(index)
+                        if (failure) {
+                            uploadErrors.set(upload.id, failure.error.message)
+                            return
+                        }
+                        const createdFile = created[createdIndex]
+                        if (createdFile) {
+                            createdIds.add(upload.id)
+                        } else {
+                            uploadErrors.set(upload.id, "アップロード結果を確認できませんでした")
+                        }
+                        createdIndex += 1
+                    })
+
+                    setFiles((current) => [
+                        ...created,
+                        ...current.filter((item) => !created.some((createdFile) => createdFile.id === item.id))
+                    ])
+                    setUploads((current) =>
+                        current
+                            .filter((item) => !createdIds.has(item.id))
+                            .map((item) => {
+                                const error = uploadErrors.get(item.id)
+                                return error ? { ...item, error } : item
+                            })
+                    )
+                })
+                .catch((caught: unknown) => {
+                    const message =
+                        caught instanceof ApiError ? caught.message : "ファイルをアップロードできませんでした"
+                    if (caught instanceof ApiError && caught.status === 401) invalidateToken()
+                    setUploads((current) =>
+                        current.map((item) =>
+                            validUploads.some((upload) => upload.id === item.id) ? { ...item, error: message } : item
+                        )
+                    )
+                })
         },
-        [token]
+        [invalidateToken, token]
     )
 
     const handleLoadMore = async () => {

@@ -19,9 +19,9 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
             <main>{children}</main>
             <nav
                 aria-label="メインナビゲーション"
-                className="fixed inset-x-0 bottom-0 z-30 border-t border-white/70 bg-white/60 px-4 pb-4 pt-3 shadow-xl shadow-slate-950/10 backdrop-blur-2xl sm:bottom-5 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:rounded-full sm:border sm:p-1.5"
+                className="fixed inset-x-0 bottom-0 z-30 overflow-x-auto border-t border-white/70 bg-white/60 px-4 pb-4 pt-3 shadow-xl shadow-slate-950/10 backdrop-blur-2xl sm:bottom-5 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:overflow-visible sm:rounded-full sm:border sm:p-1.5"
             >
-                <div className="mx-auto flex max-w-md gap-1">
+                <div className="mx-auto flex w-max min-w-full gap-1 sm:min-w-0">
                     <a href="/" className={navItem({ active: pathname === "/" })}>
                         メモ
                     </a>
