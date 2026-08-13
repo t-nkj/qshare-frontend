@@ -5,7 +5,16 @@ import { FileList } from "@/components/file-list"
 import { FileUpload } from "@/components/file-upload"
 import { FileUploadList, type UploadingFile } from "@/components/file-upload-list"
 import { IconButton } from "@/components/ui"
-import { ApiError, deleteFile, downloadFile, listFiles, renameFile, type SharedFile, uploadFiles } from "@/lib/api"
+import {
+    ApiError,
+    deleteFile,
+    downloadFile,
+    getLatestFiles,
+    listFiles,
+    renameFile,
+    type SharedFile,
+    uploadFiles
+} from "@/lib/api"
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024
 
@@ -19,6 +28,7 @@ const validateFile = (file: File): string | null => {
 const FileHistory = () => {
     const { token, invalidateToken } = useAuth()
     const [files, setFiles] = useState<SharedFile[]>([])
+    const [latestFileIds, setLatestFileIds] = useState<ReadonlySet<string>>(new Set())
     const [nextCursor, setNextCursor] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
     const [loadingMore, setLoadingMore] = useState(false)
@@ -39,6 +49,20 @@ const FileHistory = () => {
         [invalidateToken]
     )
 
+    const loadLatestFiles = useCallback(async () => {
+        if (!token) return
+        try {
+            const latestFiles = await getLatestFiles(token)
+            setLatestFileIds(new Set(latestFiles.map((file) => file.id)))
+        } catch (caught) {
+            if (caught instanceof ApiError && caught.status === 404) {
+                setLatestFileIds(new Set())
+                return
+            }
+            handleApiError(caught, "最新ファイルを読み込めませんでした")
+        }
+    }, [handleApiError, token])
+
     const loadInitial = useCallback(async () => {
         if (!token) return
         setLoading(true)
@@ -47,12 +71,13 @@ const FileHistory = () => {
             const result = await listFiles(token)
             setFiles(result.files)
             setNextCursor(result.nextCursor)
+            await loadLatestFiles()
         } catch (caught) {
             handleApiError(caught, "ファイル一覧を読み込めませんでした")
         } finally {
             setLoading(false)
         }
-    }, [handleApiError, token])
+    }, [handleApiError, loadLatestFiles, token])
 
     useEffect(() => {
         void loadInitial()
@@ -118,6 +143,7 @@ const FileHistory = () => {
                                 return error ? { ...item, error } : item
                             })
                     )
+                    void loadLatestFiles()
                 })
                 .catch((caught: unknown) => {
                     const message =
@@ -130,7 +156,7 @@ const FileHistory = () => {
                     )
                 })
         },
-        [invalidateToken, token]
+        [invalidateToken, loadLatestFiles, token]
     )
 
     const handleLoadMore = async () => {
@@ -170,6 +196,7 @@ const FileHistory = () => {
         try {
             const updated = await renameFile(token, file.id, name)
             setFiles((current) => current.map((item) => (item.id === updated.id ? updated : item)))
+            await loadLatestFiles()
             return true
         } catch (caught) {
             handleApiError(caught, "ファイル名を変更できませんでした")
@@ -185,6 +212,7 @@ const FileHistory = () => {
         try {
             await deleteFile(token, file.id)
             setFiles((current) => current.filter((item) => item.id !== file.id))
+            await loadLatestFiles()
         } catch (caught) {
             handleApiError(caught, "ファイルを削除できませんでした")
         } finally {
@@ -217,6 +245,7 @@ const FileHistory = () => {
                 <FileList
                     token={token}
                     files={files}
+                    latestFileIds={latestFileIds}
                     loading={loading}
                     downloadingId={downloadingId}
                     deletingId={deletingId}

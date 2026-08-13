@@ -144,6 +144,11 @@ export const getLatestUrl = async (token: string): Promise<SharedUrl> => {
     return result.url
 }
 
+export const getLatestFiles = async (token: string): Promise<SharedFile[]> => {
+    const result = await request<{ type: "file"; files: SharedFile[] }>(`${API_BASE_PATH}/latest/f`, { token })
+    return result.files
+}
+
 export const listUrls = async (
     token: string,
     cursor?: string

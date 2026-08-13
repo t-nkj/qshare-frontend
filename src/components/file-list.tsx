@@ -5,6 +5,7 @@ import { Button } from "./ui"
 interface FileListProps {
     token: string | null
     files: SharedFile[]
+    latestFileIds: ReadonlySet<string>
     loading: boolean
     downloadingId: string | null
     deletingId: string | null
@@ -20,6 +21,7 @@ interface FileListProps {
 export const FileList = ({
     token,
     files,
+    latestFileIds,
     loading,
     downloadingId,
     deletingId,
@@ -52,8 +54,6 @@ export const FileList = ({
             </div>
         )
 
-    const latestUpdatedAt = Math.max(...files.map((file) => new Date(file.updatedAt).getTime()))
-
     return (
         <>
             <ol className="space-y-3">
@@ -61,7 +61,7 @@ export const FileList = ({
                     <FileCard
                         key={file.id}
                         file={file}
-                        latest={new Date(file.updatedAt).getTime() === latestUpdatedAt}
+                        latest={latestFileIds.has(file.id)}
                         token={token}
                         downloading={downloadingId === file.id}
                         deleting={deletingId === file.id}
