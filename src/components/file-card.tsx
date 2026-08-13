@@ -6,6 +6,7 @@ import { Button, glassPanel, IconButton, inputStyles } from "./ui"
 
 interface FileCardProps {
     file: SharedFile
+    latest: boolean
     token: string | null
     downloading: boolean
     deleting: boolean
@@ -28,6 +29,7 @@ const formatSize = (value: number): string => {
 
 export const FileCard = ({
     file,
+    latest,
     token,
     downloading,
     deleting,
@@ -85,6 +87,11 @@ export const FileCard = ({
             <div className="pointer-events-none relative flex items-start gap-3">
                 <FilePreview file={file} token={token} />
                 <div className="min-w-0 flex-1">
+                    {latest ? (
+                        <span className="mb-2 inline-block rounded-full border border-sky-100/80 bg-sky-100/70 px-2.5 py-1 text-xs font-bold text-sky-700">
+                            最新
+                        </span>
+                    ) : null}
                     <h2 title={file.name} className="truncate text-base font-bold text-slate-950">
                         {file.name}
                     </h2>

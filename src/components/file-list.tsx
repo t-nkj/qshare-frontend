@@ -51,6 +51,9 @@ export const FileList = ({
                 </p>
             </div>
         )
+
+    const latestUpdatedAt = Math.max(...files.map((file) => new Date(file.updatedAt).getTime()))
+
     return (
         <>
             <ol className="space-y-3">
@@ -58,6 +61,7 @@ export const FileList = ({
                     <FileCard
                         key={file.id}
                         file={file}
+                        latest={new Date(file.updatedAt).getTime() === latestUpdatedAt}
                         token={token}
                         downloading={downloadingId === file.id}
                         deleting={deletingId === file.id}
