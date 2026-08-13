@@ -215,6 +215,7 @@ const FileHistory = () => {
                     </div>
                 ) : null}
                 <FileList
+                    token={token}
                     files={files}
                     loading={loading}
                     downloadingId={downloadingId}

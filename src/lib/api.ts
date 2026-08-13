@@ -30,6 +30,7 @@ export interface SharedFile {
     name: string
     contentType: string
     size: number
+    hasThumbnail: boolean
     sourceDeviceId: string | null
     sourceDeviceName: string
     createdAt: string
@@ -255,6 +256,27 @@ export const renameFile = async (token: string, fileId: string, name: string): P
 
 export const deleteFile = async (token: string, fileId: string): Promise<void> => {
     await request<void>(`${API_BASE_PATH}/files/${fileId}`, { method: "DELETE", token })
+}
+
+export const getFileThumbnail = async (token: string, fileId: string): Promise<Blob> => {
+    const response = await fetch(`${API_BASE_PATH}/files/${fileId}/thumbnail`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store"
+    })
+    if (!response.ok) {
+        let body: ErrorBody = {}
+        try {
+            body = (await response.json()) as ErrorBody
+        } catch {
+            // A proxy failure may not contain JSON.
+        }
+        throw new ApiError(
+            response.status,
+            body.error?.code ?? "REQUEST_FAILED",
+            body.error?.message ?? "サムネイルを取得できませんでした"
+        )
+    }
+    return response.blob()
 }
 
 export const downloadFile = async (token: string, file: SharedFile): Promise<void> => {

@@ -3,6 +3,7 @@ import { FileCard } from "./file-card"
 import { Button } from "./ui"
 
 interface FileListProps {
+    token: string | null
     files: SharedFile[]
     loading: boolean
     downloadingId: string | null
@@ -17,6 +18,7 @@ interface FileListProps {
 }
 
 export const FileList = ({
+    token,
     files,
     loading,
     downloadingId,
@@ -56,6 +58,7 @@ export const FileList = ({
                     <FileCard
                         key={file.id}
                         file={file}
+                        token={token}
                         downloading={downloadingId === file.id}
                         deleting={deletingId === file.id}
                         saving={savingId === file.id}

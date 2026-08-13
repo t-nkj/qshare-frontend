@@ -1,10 +1,12 @@
 import { type SubmitEvent, useState } from "react"
 import type { SharedFile } from "@/lib/api"
+import { FilePreview } from "./file-preview"
 import { PencilIcon } from "./icons"
 import { Button, glassPanel, IconButton, inputStyles } from "./ui"
 
 interface FileCardProps {
     file: SharedFile
+    token: string | null
     downloading: boolean
     deleting: boolean
     saving: boolean
@@ -24,7 +26,16 @@ const formatSize = (value: number): string => {
     return `${(value / (1024 * 1024)).toFixed(1)} MiB`
 }
 
-export const FileCard = ({ file, downloading, deleting, saving, onDownload, onRename, onDelete }: FileCardProps) => {
+export const FileCard = ({
+    file,
+    token,
+    downloading,
+    deleting,
+    saving,
+    onDownload,
+    onRename,
+    onDelete
+}: FileCardProps) => {
     const [editing, setEditing] = useState(false)
     const [name, setName] = useState(file.name)
 
@@ -70,14 +81,15 @@ export const FileCard = ({ file, downloading, deleting, saving, onDownload, onRe
                 className="absolute inset-0 cursor-pointer rounded-3xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-500"
                 onClick={onDownload}
             />
-            <div className="pointer-events-none relative flex items-start justify-between gap-3">
-                <div className="min-w-0">
+            <div className="pointer-events-none relative flex items-start gap-3">
+                <FilePreview file={file} token={token} />
+                <div className="min-w-0 flex-1">
                     <h2 className="truncate text-base font-bold text-slate-950">{file.name}</h2>
                     <p className="mt-2 text-sm text-slate-500">
                         {file.contentType} ・ {formatSize(file.size)}
                     </p>
                 </div>
-                <div className="flex shrink-0 gap-2">
+                <div className="ml-auto flex shrink-0 gap-2">
                     <IconButton
                         label="ファイル名を編集"
                         onClick={() => {

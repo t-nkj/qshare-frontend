@@ -1,6 +1,7 @@
 import type { SharedUrl } from "@/lib/api"
 import { CheckIcon, CopyIcon } from "./icons"
 import { Button, IconButton } from "./ui"
+import { UrlFavicon } from "./url-favicon"
 
 interface UrlHistoryListProps {
     urls: SharedUrl[]
@@ -75,6 +76,7 @@ export const UrlHistoryList = ({
                             <span className="sr-only">{item.url}を開く</span>
                         </a>
                         <div className="pointer-events-none relative flex gap-3">
+                            <UrlFavicon url={item.url} />
                             <div className="min-w-0 flex-1">
                                 <div className="mb-2 flex items-center gap-2">
                                     {index === 0 ? (

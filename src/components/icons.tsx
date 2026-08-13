@@ -46,3 +46,19 @@ export const CheckIcon = (props: SVGProps<SVGSVGElement>) => (
         <path d="m5 12 4 4L19 6" />
     </svg>
 )
+
+export const LinkIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        {...props}
+    >
+        <path d="M10 13a5 5 0 0 0 7.1.1l3-3a5 5 0 0 0-7.1-7.1l-1.7 1.7" />
+        <path d="M14 11a5 5 0 0 0-7.1-.1l-3 3A5 5 0 0 0 11 21l1.7-1.7" />
+    </svg>
+)
