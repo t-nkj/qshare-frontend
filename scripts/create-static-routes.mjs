@@ -1,6 +1,6 @@
 import { copyFile, mkdir } from "node:fs/promises"
 
-const routes = ["devices", "urls", "urls/latest"]
+const routes = ["devices", "files", "urls", "urls/latest"]
 
 await Promise.all(
     routes.map(async (route) => {

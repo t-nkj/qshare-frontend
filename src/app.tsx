@@ -1,6 +1,7 @@
 import { AuthProvider } from "@/components/auth-provider"
 import { glassPanel } from "@/components/ui"
 import DevicesPage from "@/pages/devices-page"
+import FilesPage from "@/pages/files-page"
 import HomePage from "@/pages/home-page"
 import LatestPage from "@/pages/latest-page"
 import MemosPage from "@/pages/memos-page"
@@ -14,6 +15,7 @@ const CurrentPage = () => {
     const pathname = normalizePathname(window.location.pathname)
 
     if (pathname === "/devices") return <DevicesPage />
+    if (pathname === "/files") return <FilesPage />
     if (pathname === "/urls/latest") return <LatestPage />
     if (pathname === "/urls") return <HomePage />
     if (pathname === "/") return <MemosPage />

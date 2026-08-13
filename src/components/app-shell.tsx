@@ -28,6 +28,9 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
                     <a href="/urls/" className={navItem({ active: pathname === "/urls" || pathname === "/urls/" })}>
                         URL
                     </a>
+                    <a href="/files/" className={navItem({ active: pathname === "/files" || pathname === "/files/" })}>
+                        ファイル
+                    </a>
                     <a
                         href="/devices/"
                         className={navItem({ active: pathname === "/devices" || pathname === "/devices/" })}

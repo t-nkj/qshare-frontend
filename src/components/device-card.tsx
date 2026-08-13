@@ -1,6 +1,7 @@
 import type { SubmitEvent } from "react"
 import type { Device } from "@/lib/api"
-import { Button, glassPanel, inputStyles } from "./ui"
+import { PencilIcon } from "./icons"
+import { Button, glassPanel, IconButton, inputStyles } from "./ui"
 
 interface DeviceCardProps {
     device: Device
@@ -90,9 +91,9 @@ export const DeviceCard = ({
                                     {tokenCopied ? "コピーしました" : "トークンをコピー"}
                                 </Button>
                             ) : null}
-                            <Button tone="secondary" size="small" onClick={onStartEditing}>
-                                名前変更
-                            </Button>
+                            <IconButton label="端末名を編集" onClick={onStartEditing}>
+                                <PencilIcon className="size-5" />
+                            </IconButton>
                         </div>
                     </div>
                     <div className="mt-5 border-t border-white/70 pt-4">
