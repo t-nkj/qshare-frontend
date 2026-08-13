@@ -1,24 +1,23 @@
 import { type SubmitEvent, useCallback, useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { AuthGate, useAuth } from "@/components/auth-provider"
-import { Button, IconButton } from "@/components/ui"
-import { UrlComposer } from "@/components/url-composer"
-import { UrlHistoryList } from "@/components/url-history-list"
-import { ApiError, createUrl, deleteUrl, listUrls, type SharedUrl } from "@/lib/api"
+import { MemoComposer } from "@/components/memo-composer"
+import { MemoList } from "@/components/memo-list"
+import { IconButton } from "@/components/ui"
+import { ApiError, createMemo, deleteMemo, listMemos, type SharedMemo, updateMemo } from "@/lib/api"
 
-const UrlHistory = () => {
+const MemoHistory = () => {
     const { token, invalidateToken } = useAuth()
-    const [urls, setUrls] = useState<SharedUrl[]>([])
+    const [memos, setMemos] = useState<SharedMemo[]>([])
     const [nextCursor, setNextCursor] = useState<string | null>(null)
     const [draft, setDraft] = useState("")
     const [loading, setLoading] = useState(true)
     const [loadingMore, setLoadingMore] = useState(false)
     const [sending, setSending] = useState(false)
     const [deletingId, setDeletingId] = useState<string | null>(null)
-    const [copiedId, setCopiedId] = useState<string | null>(null)
+    const [updatingId, setUpdatingId] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [composerError, setComposerError] = useState<string | null>(null)
-    const [latestLinkCopied, setLatestLinkCopied] = useState(false)
 
     const handleApiError = useCallback(
         (caught: unknown, fallback: string) => {
@@ -36,11 +35,11 @@ const UrlHistory = () => {
         setLoading(true)
         setError(null)
         try {
-            const result = await listUrls(token)
-            setUrls(result.urls)
+            const result = await listMemos(token)
+            setMemos(result.memos)
             setNextCursor(result.nextCursor)
         } catch (caught) {
-            handleApiError(caught, "URL履歴を読み込めませんでした")
+            handleApiError(caught, "メモ一覧を読み込めませんでした")
         } finally {
             setLoading(false)
         }
@@ -53,24 +52,21 @@ const UrlHistory = () => {
     const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
         event.preventDefault()
         if (!token || sending) return
-        const value = draft.trim()
-        try {
-            const parsed = new URL(value)
-            if (parsed.protocol !== "http:" && parsed.protocol !== "https:") throw new Error("invalid protocol")
-        } catch {
-            setComposerError("http:// または https:// から始まるURLを入力してください")
+        const content = draft.trim()
+        if (!content || [...content].length > 10000) {
+            setComposerError("メモは1〜10,000文字で入力してください")
             return
         }
         setSending(true)
         setComposerError(null)
         try {
-            const sharedUrl = await createUrl(token, value)
-            setUrls((current) => [sharedUrl, ...current.filter((item) => item.id !== sharedUrl.id)])
+            const memo = await createMemo(token, content)
+            setMemos((current) => [memo, ...current.filter((item) => item.id !== memo.id)])
             setDraft("")
             window.scrollTo({ top: 0, behavior: "smooth" })
         } catch (caught) {
             if (caught instanceof ApiError && caught.status === 401) invalidateToken()
-            else setComposerError(caught instanceof ApiError ? caught.message : "URLを共有できませんでした")
+            else setComposerError(caught instanceof ApiError ? caught.message : "メモを共有できませんでした")
         } finally {
             setSending(false)
         }
@@ -81,47 +77,58 @@ const UrlHistory = () => {
         setLoadingMore(true)
         setError(null)
         try {
-            const result = await listUrls(token, nextCursor)
-            setUrls((current) => [...current, ...result.urls])
+            const result = await listMemos(token, nextCursor)
+            setMemos((current) => [...current, ...result.memos])
             setNextCursor(result.nextCursor)
         } catch (caught) {
-            handleApiError(caught, "続きの履歴を読み込めませんでした")
+            handleApiError(caught, "続きのメモを読み込めませんでした")
         } finally {
             setLoadingMore(false)
         }
     }
 
-    const handleDelete = async (item: SharedUrl) => {
-        if (!token || deletingId) return
-        setDeletingId(item.id)
+    const handleCopy = async (content: string): Promise<boolean> => {
+        try {
+            await navigator.clipboard.writeText(content)
+            return true
+        } catch {
+            setError("メモをコピーできませんでした")
+            return false
+        }
+    }
+
+    const handleUpdate = async (memo: SharedMemo, content: string): Promise<boolean> => {
+        if (!token || updatingId) return false
+        const trimmedContent = content.trim()
+        if (!trimmedContent || [...trimmedContent].length > 10000) {
+            setError("メモは1〜10,000文字で入力してください")
+            return false
+        }
+        setUpdatingId(memo.id)
         setError(null)
         try {
-            await deleteUrl(token, item.id)
-            setUrls((current) => current.filter((url) => url.id !== item.id))
+            const updated = await updateMemo(token, memo.id, trimmedContent)
+            setMemos((current) => current.map((item) => (item.id === updated.id ? updated : item)))
+            return true
         } catch (caught) {
-            handleApiError(caught, "URLを削除できませんでした")
+            handleApiError(caught, "メモを編集できませんでした")
+            return false
+        } finally {
+            setUpdatingId(null)
+        }
+    }
+
+    const handleDelete = async (memo: SharedMemo) => {
+        if (!token || deletingId) return
+        setDeletingId(memo.id)
+        setError(null)
+        try {
+            await deleteMemo(token, memo.id)
+            setMemos((current) => current.filter((item) => item.id !== memo.id))
+        } catch (caught) {
+            handleApiError(caught, "メモを削除できませんでした")
         } finally {
             setDeletingId(null)
-        }
-    }
-
-    const handleCopy = async (url: string, urlId: string) => {
-        try {
-            await navigator.clipboard.writeText(url)
-            setCopiedId(urlId)
-            window.setTimeout(() => setCopiedId(null), 1000)
-        } catch {
-            setError("URLをコピーできませんでした")
-        }
-    }
-
-    const copyLatestLink = async () => {
-        try {
-            await navigator.clipboard.writeText(new URL("/urls/latest/", window.location.origin).toString())
-            setLatestLinkCopied(true)
-            window.setTimeout(() => setLatestLinkCopied(false), 1000)
-        } catch {
-            setError("最新URLページのリンクをコピーできませんでした")
         }
     }
 
@@ -131,18 +138,13 @@ const UrlHistory = () => {
                 <header className="mb-6 flex items-end justify-between gap-4">
                     <div>
                         <p className="mb-1 text-sm font-semibold text-sky-600">QShare</p>
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">共有URL</h1>
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">メモ</h1>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Button tone="secondary" size="small" onClick={() => void copyLatestLink()}>
-                            {latestLinkCopied ? "コピーしました" : "最新URL用リンクをコピー"}
-                        </Button>
-                        <IconButton label="履歴を再読み込み" onClick={() => void loadInitial()} disabled={loading}>
-                            ↻
-                        </IconButton>
-                    </div>
+                    <IconButton label="メモ一覧を再読み込み" onClick={() => void loadInitial()} disabled={loading}>
+                        ↻
+                    </IconButton>
                 </header>
-                <UrlComposer
+                <MemoComposer
                     draft={draft}
                     error={composerError}
                     sending={sending}
@@ -160,15 +162,16 @@ const UrlHistory = () => {
                         {error}
                     </div>
                 ) : null}
-                <UrlHistoryList
-                    urls={urls}
+                <MemoList
+                    memos={memos}
                     loading={loading}
                     deletingId={deletingId}
-                    copiedId={copiedId}
+                    updatingId={updatingId}
                     nextCursor={nextCursor}
                     loadingMore={loadingMore}
-                    onDelete={(item) => void handleDelete(item)}
-                    onCopy={(url, urlId) => void handleCopy(url, urlId)}
+                    onCopy={handleCopy}
+                    onUpdate={handleUpdate}
+                    onDelete={(memo) => void handleDelete(memo)}
                     onLoadMore={() => void handleLoadMore()}
                 />
             </section>
@@ -176,10 +179,10 @@ const UrlHistory = () => {
     )
 }
 
-const HomePage = () => (
+const MemosPage = () => (
     <AuthGate>
-        <UrlHistory />
+        <MemoHistory />
     </AuthGate>
 )
 
-export default HomePage
+export default MemosPage

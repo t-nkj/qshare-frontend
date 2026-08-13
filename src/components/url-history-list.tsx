@@ -1,13 +1,16 @@
 import type { SharedUrl } from "@/lib/api"
+import { CheckIcon, CopyIcon } from "./icons"
 import { Button, IconButton } from "./ui"
 
 interface UrlHistoryListProps {
     urls: SharedUrl[]
     loading: boolean
     deletingId: string | null
+    copiedId: string | null
     nextCursor: string | null
     loadingMore: boolean
     onDelete: (item: SharedUrl) => void
+    onCopy: (url: string, urlId: string) => void
     onLoadMore: () => void
 }
 
@@ -28,9 +31,11 @@ export const UrlHistoryList = ({
     urls,
     loading,
     deletingId,
+    copiedId,
     nextCursor,
     loadingMore,
     onDelete,
+    onCopy,
     onLoadMore
 }: UrlHistoryListProps) => {
     if (loading)
@@ -85,6 +90,17 @@ export const UrlHistoryList = ({
                                     {item.url}
                                 </p>
                             </div>
+                            <IconButton
+                                label={copiedId === item.id ? "コピーしました" : "URLをコピー"}
+                                onClick={() => onCopy(item.url, item.id)}
+                                className="pointer-events-auto relative z-10"
+                            >
+                                {copiedId === item.id ? (
+                                    <CheckIcon className="size-5" />
+                                ) : (
+                                    <CopyIcon className="size-5" />
+                                )}
+                            </IconButton>
                             <IconButton
                                 label="URLを削除"
                                 tone="danger"

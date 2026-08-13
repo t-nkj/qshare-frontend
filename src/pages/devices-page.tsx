@@ -55,7 +55,7 @@ const DeviceManagement = () => {
         try {
             await navigator.clipboard.writeText(token)
             setTokenCopied(true)
-            window.setTimeout(() => setTokenCopied(false), 2500)
+            window.setTimeout(() => setTokenCopied(false), 1000)
         } catch {
             setError("端末トークンをコピーできませんでした")
         }

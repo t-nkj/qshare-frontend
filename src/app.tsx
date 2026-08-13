@@ -3,6 +3,7 @@ import { glassPanel } from "@/components/ui"
 import DevicesPage from "@/pages/devices-page"
 import HomePage from "@/pages/home-page"
 import LatestPage from "@/pages/latest-page"
+import MemosPage from "@/pages/memos-page"
 
 const normalizePathname = (pathname: string): string => {
     if (pathname === "/") return pathname
@@ -13,8 +14,9 @@ const CurrentPage = () => {
     const pathname = normalizePathname(window.location.pathname)
 
     if (pathname === "/devices") return <DevicesPage />
-    if (pathname === "/latest") return <LatestPage />
-    if (pathname === "/") return <HomePage />
+    if (pathname === "/urls/latest") return <LatestPage />
+    if (pathname === "/urls") return <HomePage />
+    if (pathname === "/") return <MemosPage />
 
     return (
         <main className="flex min-h-dvh items-center justify-center bg-linear-to-br from-sky-100 via-slate-50 to-violet-100 px-4">
@@ -25,7 +27,7 @@ const CurrentPage = () => {
                     href="/"
                     className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-colors duration-300 hover:bg-blue-700"
                 >
-                    URL履歴へ戻る
+                    メモへ戻る
                 </a>
             </section>
         </main>

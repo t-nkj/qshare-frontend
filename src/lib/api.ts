@@ -15,6 +15,16 @@ export interface SharedUrl {
     expiresAt: string
 }
 
+export interface SharedMemo {
+    id: string
+    content: string
+    sourceDeviceId: string | null
+    sourceDeviceName: string
+    createdAt: string
+    updatedAt: string
+    expiresAt: string
+}
+
 const API_BASE_PATH = "/api/v1"
 
 interface ErrorBody {
@@ -39,7 +49,7 @@ export class ApiError extends Error {
 interface RequestOptions {
     method?: "GET" | "POST" | "PATCH" | "DELETE"
     token?: string
-    body?: Record<string, string>
+    body?: Record<string, string | boolean>
 }
 
 const request = async <T>(path: string, options: RequestOptions = {}): Promise<T> => {
@@ -118,4 +128,37 @@ export const listUrls = async (
 
 export const deleteUrl = async (token: string, urlId: string): Promise<void> => {
     await request<void>(`${API_BASE_PATH}/urls/${urlId}`, { method: "DELETE", token })
+}
+
+export const createMemo = async (token: string, content: string): Promise<SharedMemo> => {
+    const result = await request<{ created: Array<{ type: "memo"; memo: SharedMemo }> }>(`${API_BASE_PATH}/memos`, {
+        method: "POST",
+        token,
+        body: { content, autoDetectUrls: false }
+    })
+    const memo = result.created.find((item) => item.type === "memo")?.memo
+    if (!memo) throw new ApiError(500, "MEMO_NOT_CREATED", "メモを作成できませんでした")
+    return memo
+}
+
+export const listMemos = async (
+    token: string,
+    cursor?: string
+): Promise<{ memos: SharedMemo[]; nextCursor: string | null }> => {
+    const query = new URLSearchParams({ limit: "50" })
+    if (cursor) query.set("cursor", cursor)
+    return request(`${API_BASE_PATH}/memos?${query.toString()}`, { token })
+}
+
+export const updateMemo = async (token: string, memoId: string, content: string): Promise<SharedMemo> => {
+    const result = await request<{ memo: SharedMemo }>(`${API_BASE_PATH}/memos/${memoId}`, {
+        method: "PATCH",
+        token,
+        body: { content }
+    })
+    return result.memo
+}
+
+export const deleteMemo = async (token: string, memoId: string): Promise<void> => {
+    await request<void>(`${API_BASE_PATH}/memos/${memoId}`, { method: "DELETE", token })
 }

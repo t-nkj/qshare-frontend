@@ -23,7 +23,10 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
             >
                 <div className="mx-auto flex max-w-md gap-1">
                     <a href="/" className={navItem({ active: pathname === "/" })}>
-                        URL履歴
+                        メモ
+                    </a>
+                    <a href="/urls/" className={navItem({ active: pathname === "/urls" || pathname === "/urls/" })}>
+                        URL
                     </a>
                     <a
                         href="/devices/"
