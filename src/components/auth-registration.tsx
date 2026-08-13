@@ -3,7 +3,6 @@ import { ApiError, listDevices, registerDevice } from "@/lib/api"
 import { Button, glassPanel, inputStyles } from "./ui"
 
 interface RegistrationProps {
-    onIssued: (token: string, deviceId: string) => void
     onComplete: (token: string, deviceId?: string) => void
 }
 
@@ -12,57 +11,7 @@ const neoShowcaseLoginUrl = (): string => {
     return `/_oauth/login?redirect=${encodeURIComponent(redirect)}`
 }
 
-const IssuedToken = ({
-    token,
-    deviceId,
-    onComplete
-}: {
-    token: string
-    deviceId: string | null
-    onComplete: RegistrationProps["onComplete"]
-}) => {
-    const [copied, setCopied] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(token)
-            setCopied(true)
-        } catch {
-            setError("コピーできませんでした。トークンを選択してコピーしてください。")
-        }
-    }
-
-    return (
-        <div className={glassPanel({ className: "w-full max-w-lg p-6 sm:p-8" })}>
-            <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-emerald-100/70 text-2xl text-emerald-700 shadow-lg shadow-emerald-500/10">
-                ✓
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-950">端末を登録しました</h1>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-                このトークンは今だけ表示されます。ショートカットや拡張機能で使う場合はコピーしてください。
-            </p>
-            <code className="mt-5 block select-all break-all rounded-2xl border border-white/70 bg-white/50 p-4 text-sm leading-6 text-slate-800 shadow-inner shadow-slate-950/5">
-                {token}
-            </code>
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <Button tone="secondary" className="flex-1" onClick={() => void handleCopy()}>
-                    {copied ? "コピーしました" : "トークンをコピー"}
-                </Button>
-                <Button className="flex-1" onClick={() => onComplete(token, deviceId ?? undefined)}>
-                    QShareを開く
-                </Button>
-            </div>
-            {error ? (
-                <p className="mt-4 text-sm font-medium text-rose-600" role="alert">
-                    {error}
-                </p>
-            ) : null}
-        </div>
-    )
-}
-
-const RegistrationForm = ({ onIssued, onComplete }: RegistrationProps) => {
+const RegistrationForm = ({ onComplete }: RegistrationProps) => {
     const [mode, setMode] = useState<"register" | "token">("register")
     const [name, setName] = useState("")
     const [tokenInput, setTokenInput] = useState("")
@@ -80,7 +29,7 @@ const RegistrationForm = ({ onIssued, onComplete }: RegistrationProps) => {
         setError(null)
         try {
             const result = await registerDevice(trimmedName)
-            onIssued(result.token, result.device.id)
+            onComplete(result.token, result.device.id)
         } catch (caught) {
             if (caught instanceof ApiError && caught.code === "TRAQ_AUTH_REQUIRED") {
                 window.location.assign(neoShowcaseLoginUrl())
@@ -199,8 +148,5 @@ const RegistrationForm = ({ onIssued, onComplete }: RegistrationProps) => {
 }
 
 export const DeviceRegistration = ({ onComplete }: Pick<RegistrationProps, "onComplete">) => {
-    const [issued, setIssued] = useState<{ token: string; deviceId: string } | null>(null)
-
-    if (issued) return <IssuedToken token={issued.token} deviceId={issued.deviceId} onComplete={onComplete} />
-    return <RegistrationForm onIssued={(token, deviceId) => setIssued({ token, deviceId })} onComplete={onComplete} />
+    return <RegistrationForm onComplete={onComplete} />
 }
