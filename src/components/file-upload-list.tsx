@@ -15,7 +15,9 @@ export const FileUploadList = ({ uploads }: { uploads: UploadingFile[] }) => {
                     className="rounded-3xl border border-white/70 bg-white/55 px-5 py-4 shadow-xl shadow-slate-950/5 backdrop-blur-2xl"
                 >
                     <div className="flex items-center justify-between gap-3">
-                        <span className="truncate text-sm font-semibold text-slate-800">{upload.name}</span>
+                        <span title={upload.name} className="truncate text-sm font-semibold text-slate-800">
+                            {upload.name}
+                        </span>
                         <span
                             className={`shrink-0 text-sm font-semibold ${upload.error ? "text-rose-600" : "text-sky-700"}`}
                         >

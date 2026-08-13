@@ -78,13 +78,16 @@ export const FileCard = ({
             <button
                 type="button"
                 aria-label={`${file.name}をダウンロード`}
+                title={file.name}
                 className="absolute inset-0 cursor-pointer rounded-3xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-500"
                 onClick={onDownload}
             />
             <div className="pointer-events-none relative flex items-start gap-3">
                 <FilePreview file={file} token={token} />
                 <div className="min-w-0 flex-1">
-                    <h2 className="truncate text-base font-bold text-slate-950">{file.name}</h2>
+                    <h2 title={file.name} className="truncate text-base font-bold text-slate-950">
+                        {file.name}
+                    </h2>
                     <p className="mt-2 text-sm text-slate-500">
                         {file.contentType} ・ {formatSize(file.size)}
                     </p>
